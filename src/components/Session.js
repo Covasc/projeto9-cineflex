@@ -55,6 +55,7 @@ const SessionInfo = styled.div`
     width: 100%;
     max-width: 375px;
     font-size: 20px;
+    padding: 0 24px;
 
     p {
         margin-bottom: 22px;

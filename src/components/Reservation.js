@@ -28,7 +28,34 @@ function Seat ({seatinfo}) {
     );
 }
 
+function InputControl ({question, pholder, objEntry}) {
 
+    const [content, setContent] = useState("");
+
+    function EnterInput (entry){
+        objEntry = entry.target.value;
+        console.log(objEntry);
+        
+        return (
+            setContent(entry.target.value)
+        )
+    }
+
+    return (
+        <>
+            <p>{question}</p>
+            <input
+            type="text"
+            placeholder={pholder} 
+            onChange={EnterInput} 
+            value={content} ></input>
+        </>
+    )
+}
+
+function createObjectSend () {
+    console.log(object)
+}
 
 export default function Reservation () {
 
@@ -66,13 +93,11 @@ export default function Reservation () {
                 </div>
             </Instruction4>
             <BuyerInfo>
-                <p>Nome do comprador:</p>
-                <input placeholder="Digite seu nome..."></input>
-                <p>CPF do comprador:</p>
-                <input placeholder="Digite seu CPF..."></input>
+                <InputControl question="Nome do comprador:" pholder="Digite seu nome..." objEntry={object.name} />
+                <InputControl question="CPF do comprador:" pholder="Digite seu CPF..." objEntry={object.cpf}/>
             </BuyerInfo>
             <Confirm>
-                <button>Reservar assento(s)</button>
+                <button onClick={createObjectSend}>Reservar assento(s)</button>
             </Confirm>
         </>
     );
