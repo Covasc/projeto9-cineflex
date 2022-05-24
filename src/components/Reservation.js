@@ -4,6 +4,7 @@ import axios from "axios";
 import styled from "styled-components";
 import { Link, useParams } from "react-router-dom";
 import {useNavigate} from "react-router-dom";
+import Footer from "./Footer";
 
 let object = { ids: [], name: "", cpf: "" };
 let selectedSeats = [];
@@ -13,16 +14,21 @@ function Seat ({seatinfo}) {
     const [color, setColor] = React.useState("gray");
 
     function selected () {
-        if (object.ids.includes(seatinfo.id)) {
-            setColor("gray");
-            object.ids = object.ids.filter(id => id !== seatinfo.id );
-            selectedSeats = selectedSeats.filter(name => name !== seatinfo.name );
-            
+        if(seatinfo.isAvailable){
+            if (object.ids.includes(seatinfo.id)) {
+                setColor("gray");
+                object.ids = object.ids.filter(id => id !== seatinfo.id );
+                selectedSeats = selectedSeats.filter(name => name !== seatinfo.name );
+                
+            } else {
+                setColor("green");
+                object.ids.push(seatinfo.id);
+                selectedSeats.push(seatinfo.name);
+            }
         } else {
-            setColor("green");
-            object.ids.push(seatinfo.id);
-            selectedSeats.push(seatinfo.name);
+            alert("Assento não disponível.");
         }
+
     }
 
     return (
@@ -60,6 +66,8 @@ export default function Reservation ({setSucessInfo}) {
 
     const { idSession } = useParams();
     const [items, setItems] = useState([]);
+    const [infoFilme, setInfoFilme] = useState({});
+
 
 
     React.useEffect(() => {
@@ -71,6 +79,12 @@ export default function Reservation ({setSucessInfo}) {
             object.time = allMovieInfo.name;
             object.day = allMovieInfo.day.date;
             console.log(object);
+            let infoFilmeContent = {};
+            infoFilmeContent.filmName = response.data.movie.title;
+            infoFilmeContent.img = response.data.movie.posterURL;
+            infoFilmeContent.day = response.data.day.weekday;
+            infoFilmeContent.time = response.data.name;
+            setInfoFilme(infoFilmeContent);
         });
     }, []);
 
@@ -122,6 +136,7 @@ export default function Reservation ({setSucessInfo}) {
             <Confirm>
                 <button onClick={createdObjectSend}>Reservar assento(s)</button>
             </Confirm>
+            <Footer infoFilme={infoFilme}/>
         </>
     );
 }
@@ -217,7 +232,7 @@ const Circle2 = styled.div`
 const BuyerInfo = styled.div`
     width: 100%;
     max-width: 375px;
-    padding: 50px 24px;
+    padding: 50px 24px 30px 24px;
     font-size: 18px;
 
     input {

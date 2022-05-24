@@ -5,23 +5,29 @@ import styled from "styled-components";
 import Footer from "./Footer";   
 import { Link, useParams } from "react-router-dom";
 
+
 export default function Session () {
 
-    const { idMovie } = useParams();    
-    const [items, setItems] = useState([]);
-    const [infoFilme, setInfoFilme] = useState([]);
 
-    let infoFilmeContent = []
+    const { idMovie } = useParams();    
+    const [items, setItems] = useState({});
+    const [infoFilme, setInfoFilme] = useState({});
+
+    console.log(items)
 
     React.useEffect(() => {
         const promisse = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/movies/${idMovie}/showtimes`);
         promisse.then((response) => {
-            setItems(response.data.days);
-            infoFilmeContent.push(response.data.title);
+            let infoFilmeContent = {};
+            setItems(response.data);
+            infoFilmeContent.filmName = response.data.title;
+            infoFilmeContent.img = response.data.posterURL;
+            console.log(infoFilmeContent);
             setInfoFilme(infoFilmeContent);
-            console.log(infoFilme);
-        });
+        }); 
     }, []);
+
+
 
     
     return (
@@ -30,7 +36,7 @@ export default function Session () {
             <p>Selecione o horário</p>
         </Instruction2>
         <SessionInfo>
-            {items.map(obj => (
+            {items.days?.map(obj => (
                 <>
                     <div>   
                         <p>{obj.weekday} - {obj.date}</p>

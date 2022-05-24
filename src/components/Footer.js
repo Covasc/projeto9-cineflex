@@ -5,10 +5,11 @@ export default function Footer ({infoFilme}) {
         <>
         <Rodape>
             <Border>
-               <img src="" alt="Movie Image"></img>
+               <img src={infoFilme.img !== undefined && infoFilme.img} alt="Movie Image"></img>
             </Border>
             <InfoFilme>
-                {infoFilme.map( item => <p>{item}</p>)}
+                <p>{infoFilme.filmName}</p>
+                <p> {infoFilme.day !== undefined && infoFilme.time !== undefined && `${infoFilme.day} - ${infoFilme.time}`} </p>
             </InfoFilme>
         </Rodape>
         </>
