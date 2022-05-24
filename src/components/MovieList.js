@@ -21,7 +21,6 @@ export default function MovieList () {
 
     return (
         <div>
-            <Header />
             <Instruction>
                 <p>Selecione o Filme</p>
             </Instruction>

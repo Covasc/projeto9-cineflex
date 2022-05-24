@@ -2,10 +2,11 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import Header from "./Header";
 import { Link, useParams } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
-let object = { ids: [], name: "", cpf: "" }
+let object = { ids: [], name: "", cpf: "" };
+let selectedSeats = [];
 
 function Seat ({seatinfo}) {
 
@@ -15,11 +16,12 @@ function Seat ({seatinfo}) {
         if (object.ids.includes(seatinfo.id)) {
             setColor("gray");
             object.ids = object.ids.filter(id => id !== seatinfo.id );
-            console.log(object.ids)
+            selectedSeats = selectedSeats.filter(name => name !== seatinfo.name );
+            
         } else {
             setColor("green");
             object.ids.push(seatinfo.id);
-            console.log(object.ids)
+            selectedSeats.push(seatinfo.name);
         }
     }
 
@@ -32,13 +34,9 @@ function InputControl ({question, pholder, objEntry}) {
 
     const [content, setContent] = useState("");
 
-    function EnterInput (entry){
-        objEntry = entry.target.value;
-        console.log(objEntry);
-        
-        return (
-            setContent(entry.target.value)
-        )
+    function getEntry (e) {
+        setContent(e.target.value);
+        objEntry === ".cpf" ? object.cpf = e.target.value : object.name = e.target.value;
     }
 
     return (
@@ -47,31 +45,56 @@ function InputControl ({question, pholder, objEntry}) {
             <input
             type="text"
             placeholder={pholder} 
-            onChange={EnterInput} 
-            value={content} ></input>
+            onChange={e => getEntry(e)} 
+            value={content}
+            ></input>
         </>
     )
 }
 
-function createObjectSend () {
-    console.log(object)
-}
+export default function Reservation ({setSucessInfo}) {
 
-export default function Reservation () {
+    let navigate = useNavigate();
+    let allMovieInfo = {}
+
 
     const { idSession } = useParams();
     const [items, setItems] = useState([]);
+
 
     React.useEffect(() => {
         const promisse = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/showtimes/${idSession}/seats`);
         promisse.then((response) => {
             setItems(response.data.seats);
+            allMovieInfo = response.data;
+            object.movie = allMovieInfo.movie.title;
+            object.time = allMovieInfo.name;
+            object.day = allMovieInfo.day.date;
+            console.log(object);
         });
     }, []);
 
+    function createdObjectSend () {
+        console.log(object);
+    
+        if (object.ids.length === 0) {
+            alert("Você deve selecionar ao menos um assento.");
+        } else {
+            if (object.name.length === 0 || object.cpf.length === 0) {
+                alert("Verifique os dados do usuário inseridos.")
+            } else {
+                const promisse = axios.post('https://mock-api.driven.com.br/api/v5/cineflex/seats/book-many', object) 
+                promisse.then(() => {
+                    object.seats = selectedSeats;
+                    setSucessInfo(object);
+                    navigate("/sucess");
+                });
+            }
+        }
+    }    
+
     return (
         <>
-            <Header />
             <Instruction3>
                 <p>Selecione o(s) assentos</p>
             </Instruction3>
@@ -93,11 +116,11 @@ export default function Reservation () {
                 </div>
             </Instruction4>
             <BuyerInfo>
-                <InputControl question="Nome do comprador:" pholder="Digite seu nome..." objEntry={object.name} />
-                <InputControl question="CPF do comprador:" pholder="Digite seu CPF..." objEntry={object.cpf}/>
+                <InputControl question="Nome do comprador:" pholder="Digite seu nome..." objEntry={".name"} />
+                <InputControl question="CPF do comprador:" pholder="Digite seu CPF..." objEntry={".cpf"}/>
             </BuyerInfo>
             <Confirm>
-                <button onClick={createObjectSend}>Reservar assento(s)</button>
+                <button onClick={createdObjectSend}>Reservar assento(s)</button>
             </Confirm>
         </>
     );
@@ -128,8 +151,6 @@ const Buttons = styled.div`
         margin: 0 3px 12px 3px;
         border-style: solid;
         font-size: 11px;
-
-        
     }
 
     .gray {

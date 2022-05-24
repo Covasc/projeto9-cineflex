@@ -2,25 +2,30 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import styled from "styled-components";
-import Header from "./Header";    
+import Footer from "./Footer";   
 import { Link, useParams } from "react-router-dom";
 
 export default function Session () {
 
     const { idMovie } = useParams();    
     const [items, setItems] = useState([]);
+    const [infoFilme, setInfoFilme] = useState([]);
+
+    let infoFilmeContent = []
 
     React.useEffect(() => {
         const promisse = axios.get(`https://mock-api.driven.com.br/api/v5/cineflex/movies/${idMovie}/showtimes`);
         promisse.then((response) => {
             setItems(response.data.days);
+            infoFilmeContent.push(response.data.title);
+            setInfoFilme(infoFilmeContent);
+            console.log(infoFilme);
         });
     }, []);
 
     
     return (
         <>
-        <Header />
         <Instruction2>
             <p>Selecione o horário</p>
         </Instruction2>
@@ -37,6 +42,7 @@ export default function Session () {
             ) 
             )}
         </SessionInfo>
+        <Footer infoFilme={infoFilme}/>
         </>   
     );
 }
