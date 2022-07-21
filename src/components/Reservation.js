@@ -253,6 +253,7 @@ const Confirm = styled.div`
     justify-content: center;
     width: 100%;
     max-width: 375px;
+    margin-bottom: 150px;
 
     button {
         width: 225px;
